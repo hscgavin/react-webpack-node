@@ -1,5 +1,6 @@
 import express from 'express';
 import passport from 'passport';
+import helmet from 'helmet';
 import session from 'express-session';
 import bodyParser from 'body-parser';
 import path from 'path';
@@ -13,10 +14,17 @@ import { session as dbSession } from '../db';
 export default (app) => {
   app.set('port', (process.env.PORT || 3000));
 
-  // X-Powered-By header has no functional value.
-  // Keeping it makes it easier for an attacker to build the site's profile
-  // It can be removed safely
-  app.disable('x-powered-by');
+  // using Helmet, a set of Express middleware, to help lock down and secure our web application
+  // Running app.use(helmet()) will include:
+  // dnsPrefetchControl: controls browser DNS prefetching
+  // frameguard: to prevent clickjacking
+  // hidePoweredBy: to remove the X-Powered-By header
+  // hsts: for HTTP Strict Transport Security
+  // ieNoOpen: sets X-Download-Options for IE8+
+  // noSniff: to keep clients from sniffing the MIME type
+  // xssFilter: adds some small XSS protections
+  // If you need to customize, check out more configuration options on https://www.npmjs.com/package/helmet
+  app.use(helmet());
   
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
